@@ -11,6 +11,7 @@ const ConfirmationPage = () => {
   const [walletAddress, setWalletAddress] = useState("");
   const [googleFitConnected, setGoogleFitConnected] = useState(false);
   const [googleFitAccessToken, setGoogleFitAccessToken] = useState("");
+  const [googleFitRefreshToken, setGoogleFitRefreshToken] = useState("");
   const [steps, setSteps] = useState(0);
   const [interests, setInterests] = useState("");
   const [userEmail, setUserEmail] = useState("");
@@ -65,11 +66,13 @@ const ConfirmationPage = () => {
     }
   };
 
-  // Handle Google Fit Login
+  // Handle Google Fit Login and retrieve access token & refresh token
   const handleGoogleFitLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       const accessToken = tokenResponse.access_token;
+      const refreshToken = tokenResponse.refresh_token; // Get the refresh token
       setGoogleFitAccessToken(accessToken);
+      setGoogleFitRefreshToken(refreshToken); // Store the refresh token
       setGoogleFitConnected(true);
 
       try {
@@ -122,6 +125,7 @@ const ConfirmationPage = () => {
         email: userEmail,
         wallet_address: walletAddress,
         google_fit_access_token: googleFitAccessToken,
+        google_fit_refresh_token: googleFitRefreshToken, // Save the refresh token as well
         steps,
         interests,
       },
