@@ -231,25 +231,39 @@ const Dashboard = () => {
               },
             }
           );
-
+    
           const stepData = res.data.bucket.reduce((total, bucket) => {
             if (bucket.dataset[0].point.length > 0) {
               return total + bucket.dataset[0].point[0].value[0].intVal;
             }
             return total;
           }, 0);
-
-          setSteps(stepData);
-          updateLeaderboard(stepData);
+    
+          setSteps(stepData); // Update state
+    
+          // Update steps in user_profiles table
+          const { error: profileError } = await supabase
+            .from("user_profiles")
+            .update({ steps: stepData }) // Ensure `steps` column exists
+            .eq("email", email);
+    
+          if (profileError) {
+            console.error("Error updating steps in user_profiles:", profileError);
+          } else {
+            console.log("Updated steps in user_profiles:", stepData);
+          }
+    
+          // Update leaderboard
+          await updateLeaderboard(stepData);
         } catch (error) {
           console.error("Failed to fetch steps data:", error);
           if (error.response && error.response.status === 401) {
-            await refreshAccessToken();
+            await refreshAccessToken(); // Refresh the token if unauthorized
           }
         }
       }
     };
-
+    
     fetchSteps();
     const interval = setInterval(fetchSteps, 10000);
 
