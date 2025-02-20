@@ -1,0 +1,51 @@
+.quiz-container {
+    width: 50%;
+    margin: auto;
+    text-align: center;
+}
+
+.question-page {
+    background: #f4f4f4;
+    padding: 20px;
+    border-radius: 10px;
+}
+
+.options-list {
+    list-style: none;
+    padding: 0;
+    text-align: left;
+}
+
+.options-list li {
+    margin: 10px 0;
+}
+
+.radio-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+}
+
+input[type="radio"] {
+    margin-right: 10px;
+}
+
+.nav-buttons {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+
+button {
+    padding: 10px;
+    border: none;
+    cursor: pointer;
+    background-color: #007BFF;
+    color: white;
+    border-radius: 5px;
+}
+
+button:disabled {
+    background-color: #ccc;
+}
