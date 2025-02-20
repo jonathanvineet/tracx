@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { supabase } from "../utils/supabaseClient"; // Ensure this is configured
+import { supabase } from "../utils/supabaseClient";
 import { useGoogleLogin } from "@react-oauth/google";
 import Web3 from "web3";
 import { useNavigate } from "react-router-dom";
@@ -14,42 +14,53 @@ const ConfirmationPage = () => {
   const [googleFitRefreshToken, setGoogleFitRefreshToken] = useState("");
   const [steps, setSteps] = useState(0);
   const [interests, setInterests] = useState("");
+  const [nickname, setNickname] = useState("");
   const [userEmail, setUserEmail] = useState("");
+  const [isNicknameStep, setIsNicknameStep] = useState(false);
 
   const navigate = useNavigate();
 
-  // Check for email confirmation
   useEffect(() => {
     const confirmUser = async () => {
       const params = new URLSearchParams(window.location.search);
       const token = params.get("token");
       const email = params.get("email");
 
+      // Log token and email for debugging
+      console.log("Extracted Token:", token);
+      console.log("Extracted Email:", email);
+
       if (!token || !email) {
-        alert("Missing token or email!");
+        alert("Missing token or email in the URL!");
         return;
       }
 
-      const { error } = await supabase.auth.verifyOtp({
-        type: "signup",
-        token,
-        email,
-      });
+      try {
+        const { error } = await supabase.auth.verifyOtp({
+          type: "signup",
+          token,
+          email,
+        });
 
-      if (error) {
-        alert(`Confirmation failed: ${error.message}`);
-        return;
+        if (error) {
+          console.error("Supabase Error:", error);
+          alert(`Email confirmation failed: ${error.message}`);
+          return;
+        }
+
+        // Successfully confirmed
+        window.localStorage.setItem("email_confirmed", "true");
+        setUserEmail(email);
+        setEmailConfirmed(true);
+      } catch (err) {
+        console.error("Error during email confirmation:", err);
+        alert("An unexpected error occurred during confirmation.");
       }
-
-      window.localStorage.setItem("email_confirmed", "true");
-      setUserEmail(email);
-      setEmailConfirmed(true);
     };
 
     confirmUser();
   }, []);
 
-  // Handle MetaMask Wallet Connection
   const connectWallet = async () => {
     if (window.ethereum) {
       const web3 = new Web3(window.ethereum);
@@ -59,6 +70,7 @@ const ConfirmationPage = () => {
         setWalletAddress(accounts[0]);
         setWalletConnected(true);
       } catch (error) {
+        console.error("MetaMask connection error:", error);
         alert("MetaMask connection failed!");
       }
     } else {
@@ -66,22 +78,20 @@ const ConfirmationPage = () => {
     }
   };
 
-  // Handle Google Fit Login and retrieve access token & refresh token
   const handleGoogleFitLogin = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       const accessToken = tokenResponse.access_token;
-      const refreshToken = tokenResponse.refresh_token; // Get the refresh token
+      const refreshToken = tokenResponse.refresh_token;
+
       setGoogleFitAccessToken(accessToken);
-      setGoogleFitRefreshToken(refreshToken); // Store the refresh token
+      setGoogleFitRefreshToken(refreshToken);
       setGoogleFitConnected(true);
 
       try {
         const res = await axios.post(
           "https://www.googleapis.com/fitness/v1/users/me/dataset:aggregate",
           {
-            aggregateBy: [
-              { dataTypeName: "com.google.step_count.delta" },
-            ],
+            aggregateBy: [{ dataTypeName: "com.google.step_count.delta" }],
             bucketByTime: { durationMillis: 86400000 },
             startTimeMillis: new Date().setHours(0, 0, 0, 0),
             endTimeMillis: new Date().getTime(),
@@ -103,42 +113,72 @@ const ConfirmationPage = () => {
 
         setSteps(stepData);
       } catch (error) {
+        console.error("Google Fit API error:", error);
         alert("Failed to fetch Google Fit data!");
       }
     },
     onError: (error) => {
+      console.error("Google Fit login error:", error);
       alert("Google Fit login failed!");
-      console.error(error);
     },
     scope: "https://www.googleapis.com/auth/fitness.activity.read",
   });
 
-  // Handle Interests Form Submission
   const handleInterestsSubmit = async () => {
     if (!interests) {
       alert("Please enter your interests!");
       return;
     }
 
-    const { error } = await supabase.from("user_profiles").upsert(
-      {
-        email: userEmail,
-        wallet_address: walletAddress,
-        google_fit_access_token: googleFitAccessToken,
-        google_fit_refresh_token: googleFitRefreshToken, // Save the refresh token as well
-        steps,
-        interests,
-      },
-      { onConflict: "email" }
-    );
+    try {
+      const { error } = await supabase.from("user_profiles").upsert(
+        {
+          email: userEmail,
+          wallet_address: walletAddress,
+          google_fit_access_token: googleFitAccessToken,
+          google_fit_refresh_token: googleFitRefreshToken,
+          steps,
+          interests,
+        },
+        { onConflict: "email" }
+      );
 
-    if (error) {
-      alert(`Error saving user profile: ${error.message}`);
+      if (error) {
+        throw error;
+      }
+
+      setIsNicknameStep(true);
+    } catch (error) {
+      console.error("Error saving interests:", error);
+      alert(`Error saving interests: ${error.message}`);
+    }
+  };
+
+  const handleNicknameSubmit = async () => {
+    if (!nickname) {
+      alert("Please enter your nickname!");
       return;
     }
 
-    alert("Profile saved successfully!");
-    navigate("/dashboard", { state: { email: userEmail } });
+    try {
+      const { error } = await supabase.from("user_profiles").upsert(
+        {
+          email: userEmail,
+          nickname,
+        },
+        { onConflict: "email" }
+      );
+
+      if (error) {
+        throw error;
+      }
+
+      alert("Profile saved successfully!");
+      navigate("/dashboard", { state: { email: userEmail } });
+    } catch (error) {
+      console.error("Error saving nickname:", error);
+      alert(`Error saving nickname: ${error.message}`);
+    }
   };
 
   return (
@@ -146,16 +186,29 @@ const ConfirmationPage = () => {
       {emailConfirmed ? (
         walletConnected ? (
           googleFitConnected ? (
-            <div>
-              <h2>Steps Data Fetched: {steps}</h2>
-              <input
-                type="text"
-                placeholder="Enter your interests"
-                value={interests}
-                onChange={(e) => setInterests(e.target.value)}
-              />
-              <button onClick={handleInterestsSubmit}>Save Interests</button>
-            </div>
+            isNicknameStep ? (
+              <div>
+                <h2>Enter Your Nickname</h2>
+                <input
+                  type="text"
+                  placeholder="Enter your nickname"
+                  value={nickname}
+                  onChange={(e) => setNickname(e.target.value)}
+                />
+                <button onClick={handleNicknameSubmit}>Save Nickname</button>
+              </div>
+            ) : (
+              <div>
+                <h2>Steps Data Fetched: {steps}</h2>
+                <input
+                  type="text"
+                  placeholder="Enter your interests"
+                  value={interests}
+                  onChange={(e) => setInterests(e.target.value)}
+                />
+                <button onClick={handleInterestsSubmit}>Next</button>
+              </div>
+            )
           ) : (
             <div>
               <h2>Connect Google Fit</h2>

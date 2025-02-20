@@ -8,7 +8,7 @@ const ShowLeaderboard = () => {
   const email = location.state?.email;
   const [leaderboard, setLeaderboard] = useState(null);
   const [showInvitePopup, setShowInvitePopup] = useState(false);
-  const [recipientEmail, setRecipientEmail] = useState("");
+  const [recipientNickname, setRecipientNickname] = useState("");
   const [inviteStatus, setInviteStatus] = useState("");
 
   // Fetch leaderboard details
@@ -34,45 +34,53 @@ const ShowLeaderboard = () => {
     fetchLeaderboard();
   }, [leaderboardId]);
 
-  // Invite a user
+  // Invite a user by nickname
   const inviteUser = async () => {
     setInviteStatus("");
 
-    // Validate email input
-    if (!recipientEmail.trim()) {
-      setInviteStatus("Please enter a valid email address.");
+    if (!recipientNickname.trim()) {
+      setInviteStatus("Please enter a valid nickname.");
       return;
     }
 
-    // Check if recipient exists in user_profiles
-    const { data: user, error: userError } = await supabase
+    // Fetch the recipient's email, steps, and nickname using their nickname
+    const { data: recipient, error: recipientError } = await supabase
       .from("user_profiles")
-      .select("email")
-      .eq("email", recipientEmail)
+      .select("email, steps, nickname")
+      .eq("nickname", recipientNickname)
       .single();
 
-    if (userError || !user) {
-      setInviteStatus("The email address is not registered.");
+    if (recipientError || !recipient) {
+      setInviteStatus("The nickname is not registered.");
       return;
     }
 
-    // Add to requests table
-    const { error: requestError } = await supabase.from("requests").insert({
-      sender_email: email,
-      receiver_email: recipientEmail,
-      leaderboard_id: leaderboardId,
-      leaderboard_name: leaderboard.name,
-    });
+    // Add the user to the leaderboard's users list
+    const updatedUsers = [
+      ...leaderboard.users,
+      {
+        email: recipient.email,
+        position: leaderboard.users.length + 1,
+        steps: recipient.steps,
+        nickname: recipient.nickname,
+      },
+    ];
 
-    if (requestError) {
-      console.error("Error sending invitation:", requestError);
-      setInviteStatus("Failed to send invitation. Please try again.");
+    const { error: updateError } = await supabase
+      .from("leaderboards")
+      .update({ users: updatedUsers })
+      .eq("id", leaderboardId);
+
+    if (updateError) {
+      console.error("Error updating leaderboard:", updateError);
+      setInviteStatus("Failed to add user. Please try again.");
       return;
     }
 
-    setInviteStatus(`Invitation sent to ${recipientEmail}!`);
-    setRecipientEmail(""); // Clear input field
-    setShowInvitePopup(false); // Close popup
+    setLeaderboard({ ...leaderboard, users: updatedUsers });
+    setInviteStatus(`${recipientNickname} has been added to the leaderboard!`);
+    setRecipientNickname("");
+    setShowInvitePopup(false);
   };
 
   if (!leaderboard) {
@@ -86,7 +94,7 @@ const ShowLeaderboard = () => {
       <ul>
         {leaderboard.users.map((user, index) => (
           <li key={index}>
-            {user.email} - Position: {user.position}, Steps: {user.steps}
+            {user.nickname} - Position: {user.position}, Steps: {user.steps}
           </li>
         ))}
       </ul>
@@ -100,10 +108,10 @@ const ShowLeaderboard = () => {
         <div style={{ border: "1px solid black", padding: "1rem", margin: "1rem 0" }}>
           <h3>Invite Someone to {leaderboard.name}</h3>
           <input
-            type="email"
-            placeholder="Enter recipient's email"
-            value={recipientEmail}
-            onChange={(e) => setRecipientEmail(e.target.value)}
+            type="text"
+            placeholder="Enter recipient's nickname"
+            value={recipientNickname}
+            onChange={(e) => setRecipientNickname(e.target.value)}
           />
           <button onClick={inviteUser}>Send Invite</button>
           <button onClick={() => setShowInvitePopup(false)}>Cancel</button>
