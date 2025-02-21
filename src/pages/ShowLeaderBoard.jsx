@@ -207,7 +207,7 @@ const ShowLeaderboard = () => {
       <button onClick={startLeaderboard}>Start</button>
       <button onClick={() => setShowInvitePopup(true)}>Invite People</button>
 
-      {leaderboard.type === "quiz" && (
+      
         <div>
           <h3>Stake ETH to Join</h3>
           <EthereumTransaction
@@ -223,7 +223,7 @@ const ShowLeaderboard = () => {
           />
           {stakeStatus && <p>{stakeStatus}</p>}
         </div>
-      )}
+      
 
       {showInvitePopup && (
         <div style={{ border: "1px solid black", padding: "1rem", margin: "1rem 0" }}>
