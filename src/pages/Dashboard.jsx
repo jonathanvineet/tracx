@@ -199,7 +199,7 @@ const Dashboard = () => {
   // Update steps in the leaderboard
   const updateLeaderboard = async (newSteps) => {
     try {
-      const leaderboards = await fetchLeaderboard(email); // Fetch all leaderboards
+      const leaderboards = await fetchLeaderboard(email); // Fetch all leaderboards for the user
       if (!leaderboards || leaderboards.length === 0) {
         console.log("No leaderboards found for the user.");
         return;
@@ -213,6 +213,14 @@ const Dashboard = () => {
         const updatedUsers = users.map((user) =>
           user.email === email ? { ...user, steps: newSteps } : user
         );
+  
+        // Sort users by steps in descending order
+        updatedUsers.sort((a, b) => b.steps - a.steps);
+  
+        // Update positions based on the sorted order
+        updatedUsers.forEach((user, index) => {
+          user.position = index + 1;
+        });
   
         // Update the leaderboard in the database
         const { error } = await supabase
@@ -230,7 +238,7 @@ const Dashboard = () => {
     } catch (error) {
       console.error("Unexpected error:", error);
     }
-  };
+  };  
   // Fetch steps from Google Fit
   useEffect(() => {
     const fetchSteps = async () => {

@@ -9,6 +9,7 @@ import MyLeaderboards from "./pages/MyLeaderBoards";
 import Leaderboards from "./pages/Leaderboards";
 import Requests from "./pages/Requests";
 import Quiz from "./pages/QuizPage";
+import Results from "./pages/ResultsPage";
 function App() {
   return (
     <Routes>
@@ -20,6 +21,7 @@ function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/requests" element={<Requests />} />
         <Route path="/quiz" element={<Quiz />} />
+        <Route path="/results" element={<Results />} />
         <Route path="/show-leaderboard" element={<ShowLeaderBoard />} />
         <Route path="/create-leaderboard" element={<CreateLeaderboard />} />
         <Route path="/confirmation" element={<Confirmation />} />
