@@ -25,7 +25,6 @@ const Requests = () => {
 
     fetchRequests();
   }, [email]);
-
   const handleRequest = async (request, accept) => {
     if (accept) {
       try {
@@ -42,10 +41,10 @@ const Requests = () => {
           return;
         }
   
-        // Fetch the user's current steps and leaderboards from user_profiles
+        // Fetch the user's current steps, nickname, and leaderboards from user_profiles
         const { data: userProfile, error: profileFetchError } = await supabase
           .from("user_profiles")
-          .select("steps, leaderboards")
+          .select("steps, nickname, leaderboards")
           .eq("email", email)
           .single();
   
@@ -56,16 +55,20 @@ const Requests = () => {
         }
   
         const userSteps = userProfile?.steps || 0;
-  
-        // Ensure leaderboards is an array
+        const userNickname = userProfile?.nickname || "Unknown";
         const existingLeaderboards = Array.isArray(userProfile?.leaderboards)
           ? userProfile.leaderboards
           : [];
   
-        // Add the user to the leaderboard's users array with their current steps
+        // Add the user to the leaderboard's users array with their nickname and steps
         const updatedUsers = [
           ...leaderboard.users,
-          { email, position: leaderboard.users.length + 1, steps: userSteps },
+          {
+            email,
+            nickname: userNickname,
+            position: leaderboard.users.length + 1,
+            steps: userSteps,
+          },
         ];
   
         const { error: updateError } = await supabase
@@ -129,7 +132,6 @@ const Requests = () => {
     // Refresh the requests list
     setRequests((prev) => prev.filter((r) => r.id !== request.id));
   };
-  
   
   if (!requests.length) {
     return <p>No pending requests.</p>;

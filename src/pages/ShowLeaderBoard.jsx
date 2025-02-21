@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../utils/supabaseClient";
 import { useLocation } from "react-router-dom";
+import EthereumTransaction from "/src/pages/EthereumTransaction.jsx";
+
 
 const ShowLeaderboard = () => {
   const location = useLocation();
@@ -10,6 +12,9 @@ const ShowLeaderboard = () => {
   const [showInvitePopup, setShowInvitePopup] = useState(false);
   const [recipientNickname, setRecipientNickname] = useState("");
   const [inviteStatus, setInviteStatus] = useState("");
+  const [stakeStatus, setStakeStatus] = useState("");
+  const [transactionHash, setTransactionHash] = useState(null);
+  const defaultWalletAddress = "0x2B5c206516c34896D41DB511BAB9E878F8C1C109"
 
   // Fetch leaderboard details
   useEffect(() => {
@@ -34,37 +39,58 @@ const ShowLeaderboard = () => {
     fetchLeaderboard();
   }, [leaderboardId]);
 
-  // Invite a user by nickname
-  const inviteUser = async () => {
-    setInviteStatus("");
+  // Invite a user
+// Invite a user
+const inviteUser = async () => {
+  setInviteStatus("");
 
-    if (!recipientNickname.trim()) {
-      setInviteStatus("Please enter a valid nickname.");
-      return;
-    }
+  // Validate nickname input
+  if (!recipientNickname.trim()) {
+    setInviteStatus("Please enter a valid nickname.");
+    return;
+  }
 
-    // Fetch the recipient's email, steps, and nickname using their nickname
-    const { data: recipient, error: recipientError } = await supabase
-      .from("user_profiles")
-      .select("email, steps, nickname")
-      .eq("nickname", recipientNickname)
-      .single();
+  // Check if recipient exists in user_profiles by nickname
+  const { data: user, error: userError } = await supabase
+    .from("user_profiles")
+    .select("email, nickname")
+    .eq("nickname", recipientNickname)
+    .single();
 
-    if (recipientError || !recipient) {
-      setInviteStatus("The nickname is not registered.");
-      return;
-    }
+  if (userError || !user) {
+    setInviteStatus("The nickname is not registered.");
+    return;
+  }
 
-    // Add the user to the leaderboard's users list
-    const updatedUsers = [
-      ...leaderboard.users,
-      {
-        email: recipient.email,
-        position: leaderboard.users.length + 1,
-        steps: recipient.steps,
-        nickname: recipient.nickname,
-      },
-    ];
+  // Add to requests table
+  const { error: requestError } = await supabase.from("requests").insert({
+    sender_email: email, // Sender's email
+    receiver_email: user.email, // Recipient's email fetched by nickname
+    leaderboard_id: leaderboardId, // Current leaderboard ID
+    leaderboard_name: leaderboard.name, // Current leaderboard name
+  });
+
+  if (requestError) {
+    console.error("Error sending invitation:", requestError);
+    setInviteStatus("Failed to send invitation. Please try again.");
+    return;
+  }
+
+  setInviteStatus(`Invitation sent to ${recipientNickname} (${user.email})!`);
+  setRecipientNickname(""); // Clear input field
+  setShowInvitePopup(false); // Close popup
+};
+
+  
+  const handleTransactionSuccess = async (txHash) => {
+    setTransactionHash(txHash);
+    setStakeStatus("Transaction successful! Updating leaderboard...");
+
+    const updatedUsers = leaderboard.users.map((user) =>
+      user.email === email
+        ? { ...user, stake: true, transactionHash: txHash }
+        : user
+    );
 
     const { error: updateError } = await supabase
       .from("leaderboards")
@@ -73,15 +99,21 @@ const ShowLeaderboard = () => {
 
     if (updateError) {
       console.error("Error updating leaderboard:", updateError);
-      setInviteStatus("Failed to add user. Please try again.");
+      setStakeStatus("Failed to update leaderboard. Please try again.");
       return;
     }
 
     setLeaderboard({ ...leaderboard, users: updatedUsers });
-    setInviteStatus(`${recipientNickname} has been added to the leaderboard!`);
-    setRecipientNickname("");
-    setShowInvitePopup(false);
+    setStakeStatus("Stake successful! You are now added to the leaderboard.");
   };
+
+  // Handle ETH transaction failure
+  const handleTransactionFailure = (error) => {
+    console.error("Transaction failed:", error);
+    setStakeStatus("Failed to stake ETH. Please try again.");
+  };
+
+
 
   if (!leaderboard) {
     return <p>Loading leaderboard...</p>;
@@ -92,32 +124,44 @@ const ShowLeaderboard = () => {
       <h1>{leaderboard.name}</h1>
       <h2>Participants:</h2>
       <ul>
-        {leaderboard.users.map((user, index) => (
-          <li key={index}>
-            {user.nickname} - Position: {user.position}, Steps: {user.steps}
-          </li>
-        ))}
-      </ul>
+  {leaderboard.users.map((user, index) => (
+    <li key={index}>
+      {user.nickname} ({user.email}) - Position: {user.position}, Steps: {user.steps}
+    </li>
+  ))}
+</ul>
+
       <p>Your email: {email}</p>
 
       {/* Invite Button */}
       <button onClick={() => setShowInvitePopup(true)}>Invite People</button>
-
-      {/* Invite Popup */}
-      {showInvitePopup && (
-        <div style={{ border: "1px solid black", padding: "1rem", margin: "1rem 0" }}>
-          <h3>Invite Someone to {leaderboard.name}</h3>
-          <input
-            type="text"
-            placeholder="Enter recipient's nickname"
-            value={recipientNickname}
-            onChange={(e) => setRecipientNickname(e.target.value)}
+      {leaderboard.type === "quiz" && (
+        <div>
+          <h3>Stake ETH to Join</h3>
+          <EthereumTransaction
+            defaultWalletAddress={defaultWalletAddress}
+            onSuccess={handleTransactionSuccess}
+            onFailure={handleTransactionFailure}
           />
-          <button onClick={inviteUser}>Send Invite</button>
-          <button onClick={() => setShowInvitePopup(false)}>Cancel</button>
-          {inviteStatus && <p>{inviteStatus}</p>}
+          {stakeStatus && <p>{stakeStatus}</p>}
         </div>
       )}
+      {/* Invite Popup */}
+      {showInvitePopup && (
+  <div style={{ border: "1px solid black", padding: "1rem", margin: "1rem 0" }}>
+    <h3>Invite Someone to {leaderboard.name}</h3>
+    <input
+      type="text"
+      placeholder="Enter recipient's nickname"
+      value={recipientNickname}
+      onChange={(e) => setRecipientNickname(e.target.value)}
+    />
+    <button onClick={inviteUser}>Send Invite</button>
+    <button onClick={() => setShowInvitePopup(false)}>Cancel</button>
+    {inviteStatus && <p>{inviteStatus}</p>}
+  </div>
+)}
+
     </div>
   );
 };

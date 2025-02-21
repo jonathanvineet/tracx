@@ -16,12 +16,16 @@ const delay = (ms) => new Promise(resolve => setTimeout(resolve, ms));
 // Helper function to generate and parse questions
 async function generateQuestions(topic) {
   // Explicitly request 20 questions in a specific format.
-  const prompt = `Generate 20 multiple-choice questions on the topic "${topic}". Each question should have 4 answer choices, each on its own line. After all questions, on a new line output "Answers:" followed by the correct answers for each question in the format "1)X, 2)Y, ..." where X and Y are the correct options exactly as they appear among the choices. Ensure all questions are complete.`;
-  
+  const prompt = `Generate 20 unique multiple-choice questions on the topic "${topic}". 
+  Each question must:
+  1. Have a unique question statement.
+  2. Include exactly 4 unique options (A, B, C, D), each on a new line.
+  3. Specify the correct answer at the end in the format: "Answer: X", where X is the correct option.
+  Ensure there is no ambiguity, and all questions are properly formatted.`;
   const response = await axios.post(
     HF_API_URL,
     { inputs: prompt },
-    { headers: { Authorization: `Bearer ${HF_API_KEY}` }, timeout: 30000 }
+    { headers: { Authorization: `Bearer ${HF_API_KEY}` }, timeout: 60000}
   );
 
   console.log("Raw API Response:", JSON.stringify(response.data, null, 2));

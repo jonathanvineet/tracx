@@ -163,7 +163,7 @@ const Dashboard = () => {
       console.log("Fetched Wallet Address:", walletAddress);
   
       // Define the contract
-      const contractAddress = "0x2fF7776F1bE920666ED2B6b288D9471762C91992"; // Replace with your deployed contract address
+      const contractAddress = "0x6d203Bb93DdB6fD534Fb68031955C71927F93318"; // Replace with your deployed contract address
       const contractABI = [
         {
           "inputs": [
