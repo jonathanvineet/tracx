@@ -31,11 +31,6 @@ const CreateLeaderboard = () => {
       return;
     }
 
-    if (type === "quiz" && !topic.trim()) {
-      alert("Please enter a topic for the quiz.");
-      return;
-    }
-
     const uniqueId = Date.now().toString(); // Generate a unique ID
 
     // Fetch the user's nickname from user_profiles
@@ -58,7 +53,6 @@ const CreateLeaderboard = () => {
       name: leaderboardName,
       type, // Store selected type
       time, // Store selected time
-      topic: type === "quiz" ? topic : null, // Store topic only for quiz
       users: [
         {
           email,
@@ -66,6 +60,9 @@ const CreateLeaderboard = () => {
           nickname: userNickname, // Include the fetched nickname
           steps: type !== "quiz" ? userSteps : null, // Include steps only for non-quiz types
           stake: "unpaid", // Add stake field with default value "unpaid"
+          score: 0, // Initialize score to 0
+          quiz_status: 0,
+          time:0,
         },
       ],
     };
@@ -163,19 +160,7 @@ const CreateLeaderboard = () => {
         </select>
       </label>
       <br />
-      {type === "quiz" && (
-        <div>
-          <label>
-            Enter Topic:
-            <input
-              type="text"
-              placeholder="Enter quiz topic"
-              value={topic}
-              onChange={(e) => setTopic(e.target.value)}
-            />
-          </label>
-        </div>
-      )}
+  
       <br />
       <button onClick={createLeaderboard}>Create</button>
     </div>

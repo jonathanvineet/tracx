@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 const QuizPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const email = location.state?.email;
   const { questions } = location.state || {};
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState({});
@@ -53,7 +54,7 @@ const QuizPage = () => {
     // Force exit the quiz if tab switches or window switches exceed limits
     if (tabSwitchCount > 2 || windowSwitchCount > 2) {
       alert("You have switched tabs or windows too many times. The quiz will now end.");
-      navigate("/dashboard", { replace: true, state: {email} });
+      navigate("/dashboard", { replace: true, state: { email } });
     }
   }, [tabSwitchCount, windowSwitchCount, navigate]);
 
@@ -80,7 +81,7 @@ const QuizPage = () => {
       setSelectedOption("");
     } else {
       navigate("/results", {
-        state: { questions, selectedAnswers: { ...selectedAnswers, [currentQuestionIndex]: selectedOption } },
+        state: { email,questions, selectedAnswers: { ...selectedAnswers, [currentQuestionIndex]: selectedOption } },
       });
     }
   };

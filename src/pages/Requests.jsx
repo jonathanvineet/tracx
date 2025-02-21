@@ -65,9 +65,13 @@ const Requests = () => {
           ...leaderboard.users,
           {
             email,
-            nickname: userNickname,
-            position: leaderboard.users.length + 1,
-            steps: userSteps,
+          position: 1,
+          nickname: userNickname, // Include the fetched nickname
+          steps: userSteps, // Include steps only for non-quiz types
+          stake: "unpaid", // Add stake field with default value "unpaid"
+          score: 0, // Initialize score to 0
+          quiz_status: 0,
+          time:0,
           },
         ];
   

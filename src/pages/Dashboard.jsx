@@ -45,30 +45,7 @@ const Dashboard = () => {
 
     fetchTokens();
   }, [email]);
-  const handleStartQuiz = async () => {
-    if (!topic) {
-      alert("Please enter a topic!");
-      return;
-    }
   
-    try {
-
-  
-      const response = await axios.post("http://localhost:5000/generate-mcqs", { topic });
-      const questions = response.data.questions || [];
-  
-      if (questions.length === 0) {
-        alert("No questions generated!");
-        return;
-      }
-  
-      // Navigate to the quiz page with questions and fullscreen state
-      navigate("/quiz", { state: { questions, email } });
-    } catch (error) {
-      console.error("Error fetching questions:", error);
-      alert("Error generating quiz. Try again!");
-    }
-  };
   // Refresh the access token using the refresh token
   const refreshAccessToken = async () => {
     if (!refreshToken) {
@@ -443,16 +420,6 @@ const handleViewLeaderboard = (leaderboardId) => {
       <button onClick={showRequests}>Requests</button>
       <button onClick={() => handleGoogleFitLogin()}>Connect to Google Fit</button>
       <button onClick={toggleMintDialog}>Mint NFT</button>
-      <div>
-            <h2>Enter a Topic</h2>
-            <input
-                type="text"
-                placeholder="Enter a topic"
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-            />
-            <button onClick={handleStartQuiz}>Start Quiz</button>
-        </div>
       {showMintDialog && (
         <div
           style={{
