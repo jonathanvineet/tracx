@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
 const QuizPage = () => {
@@ -6,8 +6,56 @@ const QuizPage = () => {
   const navigate = useNavigate();
   const { questions } = location.state || {};
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-  const [selectedAnswers, setSelectedAnswers] = useState({}); // Track user answers
+  const [selectedAnswers, setSelectedAnswers] = useState({});
   const [selectedOption, setSelectedOption] = useState("");
+  const [tabSwitchCount, setTabSwitchCount] = useState(0);
+  const [windowSwitchCount, setWindowSwitchCount] = useState(0);
+  const [quizStarted, setQuizStarted] = useState(false); // Track if quiz has started
+
+  const startQuiz = async () => {
+    const element = document.documentElement;
+    if (element.requestFullscreen) {
+      await element.requestFullscreen().catch((err) => {
+        console.error("Failed to enter fullscreen:", err);
+      });
+    }
+    setQuizStarted(true);
+  };
+
+  useEffect(() => {
+    // Detect tab switching and window switching
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "hidden") {
+        setTabSwitchCount((prevCount) => prevCount + 1);
+      }
+    };
+
+    const handleWindowBlur = () => {
+      setWindowSwitchCount((prevCount) => prevCount + 1);
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+    window.addEventListener("blur", handleWindowBlur);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+      window.removeEventListener("blur", handleWindowBlur);
+
+      if (document.fullscreenElement && document.exitFullscreen) {
+        document.exitFullscreen().catch((err) =>
+          console.error("Failed to exit fullscreen:", err)
+        );
+      }
+    };
+  }, []);
+
+  useEffect(() => {
+    // Force exit the quiz if tab switches or window switches exceed limits
+    if (tabSwitchCount > 2 || windowSwitchCount > 2) {
+      alert("You have switched tabs or windows too many times. The quiz will now end.");
+      navigate("/dashboard", { replace: true, state: {email} });
+    }
+  }, [tabSwitchCount, windowSwitchCount, navigate]);
 
   if (!questions || questions.length === 0) {
     return <div>No questions available.</div>;
@@ -22,7 +70,6 @@ const QuizPage = () => {
       return;
     }
 
-    // Save the user's selected answer
     setSelectedAnswers({
       ...selectedAnswers,
       [currentQuestionIndex]: selectedOption,
@@ -30,17 +77,10 @@ const QuizPage = () => {
 
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setSelectedOption(""); // Reset selected option
+      setSelectedOption("");
     } else {
-      // Navigate to the results page when quiz is finished
       navigate("/results", {
-        state: {
-          questions,
-          selectedAnswers: {
-            ...selectedAnswers,
-            [currentQuestionIndex]: selectedOption, // Include the last answer
-          },
-        },
+        state: { questions, selectedAnswers: { ...selectedAnswers, [currentQuestionIndex]: selectedOption } },
       });
     }
   };
@@ -48,9 +88,19 @@ const QuizPage = () => {
   const handlePrevious = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);
-      setSelectedOption(selectedAnswers[currentQuestionIndex - 1] || ""); // Restore previous selection
+      setSelectedOption(selectedAnswers[currentQuestionIndex - 1] || "");
     }
   };
+
+  if (!quizStarted) {
+    return (
+      <div className="quiz-container">
+        <button onClick={startQuiz} className="start-quiz-btn">
+          Start Quiz
+        </button>
+      </div>
+    );
+  }
 
   return (
     <div className="quiz-container">
@@ -81,6 +131,10 @@ const QuizPage = () => {
             {currentQuestionIndex === questions.length - 1 ? "Submit" : "Next"}
           </button>
         </div>
+      </div>
+      <div className="switch-counts">
+        <p>Tab switches: {tabSwitchCount}</p>
+        <p>Window switches: {windowSwitchCount}</p>
       </div>
     </div>
   );

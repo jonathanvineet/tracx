@@ -11,6 +11,7 @@ const Dashboard = () => {
   const navigate = useNavigate();
   const email = location.state?.email;
   const [steps, setSteps] = useState(null);
+  const [leaderboards, setLeaderboards] = useState([]);
   const [accessToken, setAccessToken] = useState("");
   const [refreshToken, setRefreshToken] = useState("");
   const [showMintDialog, setShowMintDialog] = useState(false); 
@@ -46,26 +47,29 @@ const Dashboard = () => {
   }, [email]);
   const handleStartQuiz = async () => {
     if (!topic) {
-        alert("Please enter a topic!");
-        return;
+      alert("Please enter a topic!");
+      return;
     }
-
+  
     try {
-        const response = await axios.post("http://localhost:5000/generate-mcqs", { topic });
-        const questions = response.data.questions || [];
 
-        if (questions.length === 0) {
-            alert("No questions generated!");
-            return;
-        }
-
-        // Navigate to the quiz page with questions and email
-        navigate("/quiz", { state: { questions, email } });
+  
+      const response = await axios.post("http://localhost:5000/generate-mcqs", { topic });
+      const questions = response.data.questions || [];
+  
+      if (questions.length === 0) {
+        alert("No questions generated!");
+        return;
+      }
+  
+      // Navigate to the quiz page with questions and fullscreen state
+      navigate("/quiz", { state: { questions, email } });
     } catch (error) {
-        console.error("Error fetching questions:", error);
-        alert("Error generating quiz. Try again!");
+      console.error("Error fetching questions:", error);
+      alert("Error generating quiz. Try again!");
     }
-};// Refresh the access token using the refresh token
+  };
+  // Refresh the access token using the refresh token
   const refreshAccessToken = async () => {
     if (!refreshToken) {
       console.error("No refresh token available");
@@ -93,26 +97,45 @@ const Dashboard = () => {
       console.error("Error refreshing Google Fit access token:", error);
     }
   };
+// Fetch leaderboards function
+async function fetchLeaderboards(email) {
+  try {
+    const filter = JSON.stringify([{ email }]); // Ensure proper JSON formatting
+    const { data, error } = await supabase
+      .from('leaderboards')
+      .select('*')
+      .filter('users', 'cs', filter); // Use the 'cs' operator with a stringified filter
 
-  // Fetch leaderboard for a user
-  async function fetchLeaderboard(email) {
-    try {
-      const filter = JSON.stringify([{ email }]); // Ensure proper JSON formatting
-      const { data, error } = await supabase
-        .from('leaderboards')
-        .select('*')
-        .filter('users', 'cs', filter); // Use the 'cs' operator with a stringified filter
-  
-      if (error) {
-        throw error;
-      }
-  
-      console.log('Fetched leaderboard:', data);
-      return data;
-    } catch (error) {
-      console.error('Error fetching leaderboard:', error);
+    if (error) {
+      throw error;
     }
+
+    console.log('Fetched leaderboard:', data);
+    return data;
+  } catch (error) {
+    console.error('Error fetching leaderboard:', error);
   }
+}
+// Fetch leaderboards when component mounts or when email changes
+useEffect(() => {
+  const getLeaderboards = async () => {
+    const boards = await fetchLeaderboards(email);
+    setLeaderboards(boards);
+  };
+
+  if (email) {
+    getLeaderboards();
+  }
+}, [email]);
+
+const handleCreateLeaderboard = () => {
+  navigate("/create-leaderboard", { state: { email } });
+};
+
+const handleViewLeaderboard = (leaderboardId) => {
+  navigate("/show-leaderboard", { state: { leaderboardId, email } });
+};
+  
 
   const mintNFT = async (metadataURL) => {
     try {
@@ -199,7 +222,7 @@ const Dashboard = () => {
   // Update steps in the leaderboard
   const updateLeaderboard = async (newSteps) => {
     try {
-      const leaderboards = await fetchLeaderboard(email); // Fetch all leaderboards for the user
+      const leaderboards = await fetchLeaderboards(email); // Fetch all leaderboards for the user
       if (!leaderboards || leaderboards.length === 0) {
         console.log("No leaderboards found for the user.");
         return;
@@ -344,7 +367,79 @@ const Dashboard = () => {
     <div>
       <h1>Welcome to the Dashboard!</h1>
       <p>Your Steps Today: {steps !== null ? steps : "Loading..."}</p>
-      <button onClick={showLeaderboards}>Show My Leaderboards</button>
+        {/* Leaderboards Container */}
+      <div
+        style={{
+          border: "1px solid #ddd",
+          borderRadius: "8px",
+          padding: "20px",
+          marginTop: "20px",
+          maxWidth: "400px",
+          margin: "0 auto",
+        }}
+      >
+        <h2 style={{ textAlign: "center" }}>User Leaderboards</h2>
+        {leaderboards && leaderboards.length > 0 ? (
+  <ul style={{ listStyleType: "none", padding: 0, margin: 0 }}>
+    {leaderboards.map((leaderboard, index) => {
+      if (!leaderboard || !leaderboard.id || !leaderboard.name) {
+        console.warn("Invalid leaderboard data:", leaderboard);
+        return null;
+      }
+
+      return (
+        <li
+          key={leaderboard.id}
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: "10px 0",
+            borderBottom: "1px solid #ddd",
+          }}
+        >
+          <span>{leaderboard.name}</span>
+          <button
+            style={{
+              backgroundColor: "#007BFF",
+              color: "#fff",
+              border: "none",
+              borderRadius: "4px",
+              padding: "5px 10px",
+              cursor: "pointer",
+            }}
+            onClick={() => handleViewLeaderboard(leaderboard.id)}
+          >
+            View
+          </button>
+        </li>
+      );
+    })}
+  </ul>
+) : (
+  <p>No leaderboards found. Create one to get started!</p>
+)}
+
+        <button
+          onClick={handleCreateLeaderboard}
+          style={{
+            display: "block",
+            margin: "10px auto",
+            backgroundColor: "#28a745",
+            color: "#fff",
+            border: "none",
+            borderRadius: "50%",
+            width: "40px",
+            height: "40px",
+            fontSize: "20px",
+            lineHeight: "40px",
+            textAlign: "center",
+            cursor: "pointer",
+          }}
+        >
+          +
+        </button>
+      </div>
       <button onClick={showRequests}>Requests</button>
       <button onClick={() => handleGoogleFitLogin()}>Connect to Google Fit</button>
       <button onClick={toggleMintDialog}>Mint NFT</button>

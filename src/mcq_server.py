@@ -4,7 +4,7 @@ import re
 from flask import Flask, request, jsonify
 
 # Configure Google Generative AI API key
-genai.configure(api_key="AIzaSyD9GOVMDWmYo71aB7fHm9ANmU5aVmhefBs")
+genai.configure(api_key="AIzaSyBZxTk_xGwOhOahiOLzKY-PFBrEu21eIIU")
 
 # Initialize Flask app
 app = Flask(__name__)
