@@ -1,0 +1,131 @@
+/* Global Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: 'Poppins', sans-serif;
+}
+
+/* Page Background */
+.container {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  height: 100vh;
+  background: linear-gradient(to bottom, #0a001f, #2b1055);
+  padding: 20px;
+  gap: 20px; /* Space between the logo and the box */
+}
+
+/* Floating Lion */
+.lion {
+  height: 400px; /* Match the height of the signup box */
+  width: auto;
+  opacity: 0.8;
+  animation: floatLion 3s ease-in-out infinite alternate;
+}
+
+/* Floating Animation */
+@keyframes floatLion {
+  0% {
+    transform: translateY(0px);
+  }
+  100% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Signup Box */
+.signup-box {
+  width: 400px;
+  padding: 20px;
+  background: rgba(255, 255, 255, 0.1); /* Semi-transparent for backdrop-filter to work */
+  border-radius: 12px;
+  box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  -webkit-backdrop-filter: blur(10px); /* Safari fix */
+  backdrop-filter: blur(10px); /* Glassmorphism effect */
+  text-align: center;
+}
+
+/* Heading */
+.signup-box h2 {
+  color: white;
+  font-size: 24px;
+  font-weight: bold;
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  text-shadow: 0px 0px 10px rgba(255, 255, 255, 0.5);
+}
+
+.signup-box p {
+  color: lightgray;
+  font-size: 12px;
+  margin-bottom: 15px;
+}
+
+/* Input Fields */
+.signup-input {
+  width: 100%;
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  background: rgba(255, 255, 255, 0.1);
+  color: white;
+  outline: none;
+  transition: 0.3s;
+}
+
+.signup-input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.signup-input:focus {
+  border: 2px solid #7f56d9;
+}
+
+/* Signup Button */
+.signup-button {
+  width: 100%;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: linear-gradient(90deg, #7f56d9, #e056fd);
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.2s, background 0.3s;
+}
+
+.signup-button:disabled {
+  background: rgba(127, 86, 217, 0.7);
+  cursor: not-allowed;
+}
+
+.signup-button:hover:not(:disabled) {
+  transform: scale(1.05);
+}
+
+/* Waiting Message */
+.signup-waiting {
+  color: white;
+  font-size: 12px;
+  margin-top: 10px;
+  opacity: 0.8;
+}
+
+/* Return Link */
+.return-link {
+  display: block;
+  color: lightgray;
+  font-size: 12px;
+  margin-top: 15px;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.return-link:hover {
+  color: white;
+}

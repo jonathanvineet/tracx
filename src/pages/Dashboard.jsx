@@ -340,6 +340,8 @@ const handleViewLeaderboard = (leaderboardId) => {
     setShowMintDialog(!showMintDialog);
   };
 
+
+  
   return (
     <div>
       <h1>Welcome to the Dashboard!</h1>

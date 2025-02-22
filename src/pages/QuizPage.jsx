@@ -151,26 +151,35 @@ const QuizPage = () => {
       alert("Please select an answer before proceeding.");
       return;
     }
-
+  
     setSelectedAnswers({
       ...selectedAnswers,
       [currentQuestionIndex]: selectedOption,
     });
-
+  
     if (currentQuestionIndex < questions.length - 1) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
       setSelectedOption("");
     } else {
+      const calculatedScore = Object.values(selectedAnswers).filter(
+        (answer) => answer === "correct"
+      ).length;
+  
       navigate("/results", {
         state: {
           email,
+          leaderboardId: location.state?.leaderboardId, // Ensure leaderboardId is passed
           questions,
-          selectedAnswers: { ...selectedAnswers, [currentQuestionIndex]: selectedOption },
+          selectedAnswers: {
+            ...selectedAnswers,
+            [currentQuestionIndex]: selectedOption,
+          },
+          score: calculatedScore,
         },
       });
     }
   };
-
+  
   const handlePrevious = () => {
     if (currentQuestionIndex > 0) {
       setCurrentQuestionIndex(currentQuestionIndex - 1);

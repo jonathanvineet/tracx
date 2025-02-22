@@ -10,133 +10,155 @@ const Requests = () => {
 
   useEffect(() => {
     const fetchRequests = async () => {
-      const { data, error } = await supabase
+      const { data: requestData, error: requestError } = await supabase
         .from("requests")
         .select("*")
         .eq("receiver_email", email);
 
-      if (error) {
-        console.error("Error fetching requests:", error);
+      if (requestError) {
+        console.error("Error fetching requests:", requestError);
         return;
       }
 
-      setRequests(data);
+      if (!requestData.length) {
+        setRequests([]);
+        return;
+      }
+
+      // Fetch corresponding leaderboards for each request
+      const enrichedRequests = await Promise.all(
+        requestData.map(async (request) => {
+          const { data: leaderboard, error: leaderboardError } = await supabase
+            .from("leaderboards")
+            .select("type, topic")
+            .eq("id", request.leaderboard_id)
+            .single();
+
+          if (leaderboardError) {
+            console.error(`Error fetching leaderboard for ID ${request.leaderboard_id}:`, leaderboardError);
+            return { ...request }; // Return the request without type and topic
+          }
+
+          // Enrich request with leaderboard type and topic
+          return {
+            ...request,
+            type: leaderboard.type,
+            topic: leaderboard.topic,
+          };
+        })
+      );
+
+      setRequests(enrichedRequests);
     };
 
     fetchRequests();
   }, [email]);
+
   const handleRequest = async (request, accept) => {
     if (accept) {
       try {
-        // Fetch the leaderboard
         const { data: leaderboard, error: fetchError } = await supabase
           .from("leaderboards")
           .select("users")
           .eq("id", request.leaderboard_id)
           .single();
-  
+
         if (fetchError) {
           console.error("Error fetching leaderboard:", fetchError);
           setStatusMessage("Failed to process the request.");
           return;
         }
-  
-        // Fetch the user's current steps, nickname, and leaderboards from user_profiles
+
         const { data: userProfile, error: profileFetchError } = await supabase
           .from("user_profiles")
           .select("steps, nickname, leaderboards")
           .eq("email", email)
           .single();
-  
+
         if (profileFetchError) {
           console.error("Error fetching user profile:", profileFetchError);
           setStatusMessage("Failed to fetch user profile.");
           return;
         }
-  
+
         const userSteps = userProfile?.steps || 0;
         const userNickname = userProfile?.nickname || "Unknown";
         const existingLeaderboards = Array.isArray(userProfile?.leaderboards)
           ? userProfile.leaderboards
           : [];
-  
-        // Add the user to the leaderboard's users array with their nickname and steps
+
         const updatedUsers = [
           ...leaderboard.users,
           {
             email,
-          position: 1,
-          nickname: userNickname, // Include the fetched nickname
-          steps: userSteps, // Include steps only for non-quiz types
-          stake: "unpaid", // Add stake field with default value "unpaid"
-          score: 0, // Initialize score to 0
-          quiz_status: 0,
-          time:0,
+            position: leaderboard.users.length + 1,
+            nickname: userNickname,
+            steps: request.type === "quiz" ? null : userSteps,
+            stake: 0,
+            score: 0,
+            quiz_status: 0,
+            time: 0,
           },
         ];
-  
+
         const { error: updateError } = await supabase
           .from("leaderboards")
           .update({ users: updatedUsers })
           .eq("id", request.leaderboard_id);
-  
+
         if (updateError) {
           console.error("Error updating leaderboard:", updateError);
           setStatusMessage("Failed to process the request.");
           return;
         }
-  
-        // Append the new leaderboard ID to the user's leaderboards
+
         const updatedLeaderboards = [...existingLeaderboards, request.leaderboard_id];
-  
+
         const { error: profileUpdateError } = await supabase
           .from("user_profiles")
           .update({ leaderboards: updatedLeaderboards })
           .eq("email", email);
-  
+
         if (profileUpdateError) {
           console.error("Error updating user profile leaderboards:", profileUpdateError);
           setStatusMessage("Failed to update user profile.");
           return;
         }
-  
-        // Remove the request
+
         const { error: deleteError } = await supabase
           .from("requests")
           .delete()
           .eq("id", request.id);
-  
+
         if (deleteError) {
           console.error("Error removing request:", deleteError);
           setStatusMessage("Failed to remove the request.");
           return;
         }
-  
+
         setStatusMessage(`Successfully joined ${request.leaderboard_name}!`);
       } catch (error) {
         console.error("Error handling request:", error);
         setStatusMessage("Failed to process the request.");
       }
     } else {
-      // Decline the request (delete it from the table)
       const { error: deleteError } = await supabase
         .from("requests")
         .delete()
         .eq("id", request.id);
-  
+
       if (deleteError) {
         console.error("Error declining request:", deleteError);
         setStatusMessage("Failed to decline the request.");
         return;
       }
-  
+
       setStatusMessage("Request declined.");
     }
-  
-    // Refresh the requests list
+
     setRequests((prev) => prev.filter((r) => r.id !== request.id));
   };
-  
+
   if (!requests.length) {
     return <p>No pending requests.</p>;
   }
@@ -148,8 +170,12 @@ const Requests = () => {
       <ul>
         {requests.map((request) => (
           <li key={request.id}>
-            {request.sender_email} has invited you to join{" "}
-            {request.leaderboard_name}.
+            {request.sender_email} has invited you to join {request.leaderboard_name}.
+            {request.type === "quiz" && request.topic && (
+              <p>
+                <strong>Topic:</strong> {request.topic}
+              </p>
+            )}
             <button onClick={() => handleRequest(request, true)}>Yes</button>
             <button onClick={() => handleRequest(request, false)}>No</button>
           </li>

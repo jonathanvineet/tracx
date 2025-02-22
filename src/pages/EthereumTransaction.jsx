@@ -1,9 +1,46 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { supabase } from "../utils/supabaseClient";
 
-const EthereumTransaction = ({ defaultWalletAddress }) => {
+const EthereumTransaction = ({ id, defaultWalletAddress, userEmail }) => {
   const [amount, setAmount] = useState("");
-  const [transactionHash, setTransactionHash] = useState("");
-  const [error, setError] = useState("");
+  const [transactionHash, setTransactionHash] = useState(null);
+  const [error, setError] = useState(null);
+  const [stake, setStake] = useState(0);
+
+  useEffect(() => {
+    const fetchStake = async () => {
+      if (!id) {
+        console.error("Error: Id is undefined");
+        return;
+      }
+
+      const { data, error } = await supabase
+        .from("leaderboards")
+        .select("users")
+        .eq("id", id)
+        .maybeSingle();
+
+      if (error) {
+        console.error("Error fetching stake:", error);
+        return;
+      }
+
+      if (!data || !data.users) {
+        console.error("No data found for the given Id.");
+        return;
+      }
+      
+      const userData = data.users.find((user) => user.email === userEmail);
+      if (!userData) {
+        console.error("User not found in users JSON.");
+        return;
+      }
+
+      setStake(userData.stake ?? 0);
+    };
+
+    fetchStake();
+  }, [id, userEmail]);
 
   const handleSendTransaction = async () => {
     if (!window.ethereum) {
@@ -11,10 +48,6 @@ const EthereumTransaction = ({ defaultWalletAddress }) => {
       return;
     }
 
-    if (!amount || isNaN(amount) || parseFloat(amount) <= 0) {
-      setError("Enter a valid amount.");
-      return;
-    }
 
     setError("");
     try {
@@ -24,9 +57,9 @@ const EthereumTransaction = ({ defaultWalletAddress }) => {
       const sender = accounts[0];
 
       const transactionParameters = {
-        to: defaultWalletAddress, // The recipient address
-        from: sender, // The sender's MetaMask wallet address
-        value: (parseFloat(amount) * 1e18).toString(16), // Amount in wei (1 ETH = 10^18 wei)
+        to: defaultWalletAddress,
+        from: sender,
+        value: (parseFloat(amount) * 1e18).toString(16),
       };
 
       const txHash = await window.ethereum.request({
@@ -35,9 +68,40 @@ const EthereumTransaction = ({ defaultWalletAddress }) => {
       });
 
       setTransactionHash(txHash);
-      setAmount("");
-    } catch (err) {
-      console.error(err);
+
+      // Fetch the latest users data
+      const { data, error: fetchError } = await supabase
+        .from("leaderboards")
+        .select("users")
+        .eq("id", id)
+        .single();
+
+      if (fetchError || !data) {
+        console.error("Error fetching users JSON:", fetchError);
+        setError("Transaction succeeded, but failed to fetch users data.");
+        return;
+      }
+
+      // Update stake for the logged-in user
+      const updatedUsers = data.users.map((user) =>
+        user.email === userEmail ? { ...user, stake: Number(amount) } : user
+      );
+
+      // Update Supabase
+      const { error: updateError } = await supabase
+        .from("leaderboards")
+        .update({ users: updatedUsers })
+        .eq("id", id);
+
+      if (updateError) {
+        console.error("Error updating stake in Supabase:", updateError);
+        setError("Transaction succeeded, but failed to update stake.");
+      } else {
+        console.log("Stake updated successfully.");
+        setStake(Number(amount));
+      }
+    } catch (error) {
+      console.error(error);
       setError("Transaction failed. Please try again.");
     }
   };
@@ -45,18 +109,25 @@ const EthereumTransaction = ({ defaultWalletAddress }) => {
   return (
     <div>
       <h3>Send ETH to the Leaderboard Wallet</h3>
-      <input
-        type="text"
-        placeholder="Enter amount in ETH"
-        value={amount}
-        onChange={(e) => setAmount(e.target.value)}
-      />
-      <button onClick={handleSendTransaction}>Send</button>
+      {Number(stake ?? 0) === 0|| stake == "unpaid" ? (
+        <>
+          <input
+            type="text"
+            placeholder="Enter amount in ETH"
+            value={amount}
+            onChange={(e) => setAmount(e.target.value)}
+          />
+          <button onClick={handleSendTransaction}>Send</button>
+        </>
+      ) : (
+        <p>You have already staked. No need to send ETH again.</p>
+      )}
+
       {transactionHash && (
         <p>
           Transaction successful! Hash:{" "}
           <a
-            href={`https://etherscan.io/tx/${transactionHash}`}
+            href={'https://etherscan.io/tx/${transactionHash}'}
             target="_blank"
             rel="noopener noreferrer"
           >

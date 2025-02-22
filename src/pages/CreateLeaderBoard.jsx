@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { supabase } from "../utils/supabaseClient";
 import { useNavigate, useLocation } from "react-router-dom";
-
+import "../styles/CreateLeaderboard.css";
 const CreateLeaderboard = () => {
   const navigate = useNavigate();
   const location = useLocation();
@@ -65,7 +65,7 @@ const CreateLeaderboard = () => {
           position: 1,
           nickname: userNickname, // Include the fetched nickname
           steps: type !== "quiz" ? userSteps : null, // Include steps only for non-quiz types
-          stake: "unpaid", // Add stake field with default value "unpaid"
+          stake: 0, // Add stake field with default value "unpaid"
           score: 0, // Initialize score to 0
           quiz_status: 0,
           time:0,

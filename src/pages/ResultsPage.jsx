@@ -1,10 +1,11 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
+import { supabase } from "../utils/supabaseClient";
 
 const ResultsPage = () => {
   const location = useLocation();
   const navigate = useNavigate();
-  const { questions, selectedAnswers } = location.state || {};
+  const { questions, selectedAnswers, email, leaderboardId } = location.state || {};
 
   if (!questions || !selectedAnswers) {
     return <div>No results to display.</div>;
@@ -21,6 +22,56 @@ const ResultsPage = () => {
   };
 
   const score = calculateScore();
+
+  const updateScore = async () => {
+    if (!leaderboardId || !email) {
+      console.error("Leaderboard ID or email is undefined.");
+      return;
+    }
+
+    try {
+      // Fetch the leaderboard's users array
+      const { data: leaderboard, error: fetchError } = await supabase
+        .from("leaderboards")
+        .select("users")
+        .eq("id", leaderboardId)
+        .single();
+
+      if (fetchError || !leaderboard) {
+        console.error("Error fetching leaderboard:", fetchError);
+        return;
+      }
+
+      const updatedUsers = leaderboard.users.map((user) => {
+        if (user.email === email) {
+          return {
+            ...user,
+            score, // Update the user's score
+          };
+        }
+        return user;
+      });
+
+      // Update the leaderboard with the modified users array
+      const { error: updateError } = await supabase
+        .from("leaderboards")
+        .update({ users: updatedUsers })
+        .eq("id", leaderboardId);
+
+      if (updateError) {
+        console.error("Error updating leaderboard:", updateError);
+        return;
+      }
+
+      console.log("Score updated successfully for user:", email);
+    } catch (error) {
+      console.error("Unexpected error updating score:", error);
+    }
+  };
+
+  useEffect(() => {
+    updateScore(); // Update the score when the results page loads
+  }, []);
 
   return (
     <div className="results-container">
@@ -43,7 +94,8 @@ const ResultsPage = () => {
           </li>
         ))}
       </ul>
-      <button onClick={() => navigate("/")}>Back to Home</button>
+     
+      <button onClick={() => navigate("/show-leaderboard",{ state: { leaderboardId,email,fromResultsPage: true } })}>Back to Page</button>
     </div>
   );
 };
