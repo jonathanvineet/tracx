@@ -1,6 +1,28 @@
 # Decentralized Leaderboard and NFT Staking dApp
 
 A decentralized application (dApp) that enables users to create and participate in blockchain-based leaderboards, stake NFTs for rewards, and engage in real-time communication. This platform leverages blockchain technology for secure and transparent data handling while offering an intuitive user experience.
+## Screenshots
+
+<p align="center">
+  <img src="./screenshots/IMG-20250222-WA0011.jpg" alt="Screenshot 1" width="45%">
+  <img src="./screenshots/IMG-20250222-WA0012.jpg" alt="Screenshot 2" width="45%">
+</p>
+<p align="center">
+  <img src="./screenshots/IMG-20250222-WA0013.jpg" alt="Screenshot 3" width="45%">
+  <img src="./screenshots/IMG-20250222-WA0014.jpg" alt="Screenshot 4" width="45%">
+</p>
+<p align="center">
+  <img src="./screenshots/IMG-20250222-WA0015.jpg" alt="Screenshot 5" width="45%">
+  <img src="./screenshots/IMG-20250222-WA0016.jpg" alt="Screenshot 6" width="45%">
+</p>
+<p align="center">
+  <img src="./screenshots/IMG-20250222-WA0017.jpg" alt="Screenshot 7" width="45%">
+  <img src="./screenshots/IMG-20250222-WA0018.jpg" alt="Screenshot 8" width="45%">
+</p>
+<p align="center">
+  <img src="./screenshots/IMG-20250222-WA0019.jpg" alt="Screenshot 9" width="45%">
+  <img src="./screenshots/IMG-20250222-WA0020.jpg" alt="Screenshot 10" width="45%">
+</p>
 
 ## Features
 
