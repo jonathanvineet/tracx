@@ -3,6 +3,7 @@ import { supabase } from "../utils/supabaseClient";
 import { useLocation, useNavigate } from "react-router-dom";
 import EthereumTransaction from"./EthereumTransaction.jsx";
 import axios from "axios";
+import "./showleaderboard.css";
 
 const ShowLeaderboard = () => {
   const location = useLocation();
@@ -441,10 +442,12 @@ if(fromResultsPage){
   if (!leaderboard) {
     return <p>❌ Leaderboard not found.</p>;
   }
-
   return (
-    <div>
+    <div className="show-leaderboard-container">
+      {/* Leaderboard Name */}
       <h1>{leaderboard.name}</h1>
+  
+      {/* Participants Section */}
       <h2>Participants:</h2>
       <ul>
         {(leaderboard.users || []).map((user, index) => (
@@ -453,94 +456,103 @@ if(fromResultsPage){
           </li>
         ))}
       </ul>
-
-      <p>Your email: {email}</p>
-
-      {/* Timer */} {leaderboard.allCompleted && leaderboard.users[0]?.email === email && !rewardClaimed && (
-        <button onClick={claimReward} disabled={loading}>
-        {loading ? "Processing..." : "Claim Reward"}
-      </button>
-    )}
-
-    {rewardClaimed && <p>✅ Reward successfully claimed!</p>}
   
+      {/* Display User Email */}
+      <p>Your email: {email}</p>
+  
+      {/* Timer Display */}
       {remainingTime && (
-        <div>
-          <h3>Remaining Time: {remainingTime}</h3>
-        </div>
+        <h3>Remaining Time: {remainingTime}</h3>
       )}
-
+  
+      {/* Start & Invite Buttons */}
       <button onClick={startLeaderboard}>Start</button>
       <button onClick={() => setShowInvitePopup(true)}>Invite People</button>
-
+  
+      {/* Quiz Stake Section (For Quiz Type Leaderboard) */}
       {!fromResultsPage && leaderboard?.type === "quiz" && (
-  <div>
-    <h3>Stake ETH to Join</h3>
-    <EthereumTransaction
-      id={leaderboardId}
-      defaultWalletAddress={defaultWalletAddress}
-      userEmail={email}
-      onSuccess={(txHash) => {
-        setTransactionHash(txHash);
-        setStakeStatus("Transaction successful! Updating leaderboard...");
-      }}
-      onFailure={(error) => {
-        console.error("Transaction failed:", error);
-        setStakeStatus("Failed to stake ETH. Please try again.");
-      }}
-    />
-    {stakeStatus && <p>{stakeStatus}</p>}
-  </div>
-)}
-{leaderboard?.type === "quiz" && !allUsersStaked && (
-  <p style={{ color: "red", fontWeight: "bold" }}>
-    ⚠️ The quiz cannot start yet! Some participant(s) still need to stake ETH.
-  </p>
-)}
-
-{leaderboard?.type === "quiz" && allUsersStaked && (
-  <>
-    <p style={{ color: "green", fontWeight: "bold" }}>
-      ✅ All users have staked! You can now start the quiz.
-    </p>
-    <button onClick={handleStartQuiz}>
-      Start Quiz
-    </button>
-  </>
-
-)}  {fromResultsPage && winnerWallet && (
-  <div>
-    <p>🏆 Winner's Wallet: <strong>{winnerWallet}</strong></p>
-    <button onClick={claimReward}>Claim Reward</button>
-  </div>
-)}
-
-{usersPaid && quizStartTime && (
-        <p>Quiz will be available in {Math.ceil((quizStartTime - Date.now()) / 60000)} minutes.</p>
-      )}
-      {usersPaid && <button onClick={() => handleQuizCompletion(leaderboardId, email, 100)}>Finish Quiz</button>}
-      {usersPaid && leaderboard?.users[0]?.email === email && (
-        <button onClick={() => alert("You won the reward token!")}>Claim Reward</button>
-      )}
-
-      {showInvitePopup && (
-        <div style={{ border: "1px solid black", padding: "1rem", margin: "1rem 0" }}>
-          <h3>Invite Someone to {leaderboard.name}</h3>
-          <input
-            type="text"
-            placeholder="Enter recipient's nickname"
-            value={recipientNickname}
-            onChange={(e) => setRecipientNickname(e.target.value)}
+        <div className="quiz-section">
+          <h3>Stake ETH to Join</h3>
+          <EthereumTransaction
+            id={leaderboardId}
+            defaultWalletAddress={defaultWalletAddress}
+            userEmail={email}
+            onSuccess={(txHash) => {
+              setTransactionHash(txHash);
+              setStakeStatus("Transaction successful! Updating leaderboard...");
+            }}
+            onFailure={(error) => {
+              console.error("Transaction failed:", error);
+              setStakeStatus("Failed to stake ETH. Please try again.");
+            }}
           />
-          <button onClick={inviteUser}>Send Invite</button>
-          <button onClick={() => setShowInvitePopup(false)}>Cancel</button>
-          {inviteStatus && <p>{inviteStatus}</p>}
+          {stakeStatus && <p>{stakeStatus}</p>}
         </div>
       )}
-
+  
+      {/* Quiz Status Alerts */}
+      {leaderboard?.type === "quiz" && !allUsersStaked && (
+        <p className="alert warning">
+          ⚠️ The quiz cannot start yet! Some participant(s) still need to stake ETH.
+        </p>
+      )}
+  
+      {leaderboard?.type === "quiz" && allUsersStaked && (
+        <>
+          <p className="alert success">
+            ✅ All users have staked! You can now start the quiz.
+          </p>
+          <button onClick={handleStartQuiz}>Start Quiz</button>
+        </>
+      )}
+  
+      {/* Reward Section */}
+      {leaderboard.allCompleted && leaderboard.users[0]?.email === email && !rewardClaimed && (
+        <button className="claim-reward" onClick={claimReward} disabled={loading}>
+          {loading ? "Processing..." : "Claim Reward"}
+        </button>
+      )}
+  
+      {rewardClaimed && <p className="alert success">✅ Reward successfully claimed!</p>}
+  
+      {/* Winner Announcement */}
+      {fromResultsPage && winnerWallet && (
+        <div>
+          <p>🏆 Winner's Wallet: <strong>{winnerWallet}</strong></p>
+          <button onClick={claimReward}>Claim Reward</button>
+        </div>
+      )}
+  
+      {/* Quiz Countdown */}
+      {usersPaid && quizStartTime && (
+        <p>Quiz will be available in {Math.ceil((quizStartTime - Date.now()) / 60000)} minutes.</p>
+      )}
+  
+      {/* Finish Quiz Button */}
+      {usersPaid && (
+        <button onClick={() => handleQuizCompletion(leaderboardId, email, 100)}>Finish Quiz</button>
+      )}
+  
+  {showInvitePopup && (
+  <div className="invite-popup">
+    <h3>Invite Someone to {leaderboard.name}</h3>
+    <input
+      type="text"
+      placeholder="Enter recipient's nickname"
+      value={recipientNickname}
+      onChange={(e) => setRecipientNickname(e.target.value)}
+    />
     
+    <div className="button-container">
+      <button className="send-btn" onClick={inviteUser}>Send Invite</button>
+      <button className="cancel-btn" onClick={() => setShowInvitePopup(false)}>Cancel</button>
+    </div>
+    
+    {inviteStatus && <p>{inviteStatus}</p>}
+  </div>
+)}
+
     </div>
   );
-};
-
+};  
 export default ShowLeaderboard;

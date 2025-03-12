@@ -1,6 +1,7 @@
 import { useState, useEffect } from "react";
 import { supabase } from "../utils/supabaseClient";
 import { useLocation } from "react-router-dom";
+import "./request.css";
 
 const Requests = () => {
   const location = useLocation();
@@ -159,30 +160,36 @@ const Requests = () => {
     setRequests((prev) => prev.filter((r) => r.id !== request.id));
   };
 
-  if (!requests.length) {
-    return <p>No pending requests.</p>;
-  }
-
   return (
-    <div>
+    <div className="request-container">
       <h1>Requests</h1>
       {statusMessage && <p>{statusMessage}</p>}
-      <ul>
-        {requests.map((request) => (
-          <li key={request.id}>
-            {request.sender_email} has invited you to join {request.leaderboard_name}.
-            {request.type === "quiz" && request.topic && (
+
+      {requests.length === 0 ? (
+        <p className="no-requests">No Pending Requests</p> // Centered message
+      ) : (
+        <ul className="request-list">
+          {requests.map((request) => (
+            <li key={request.id}>
               <p>
-                <strong>Topic:</strong> {request.topic}
+                {request.sender_email} has invited you to join <strong>{request.leaderboard_name}</strong>.
               </p>
-            )}
-            <button onClick={() => handleRequest(request, true)}>Yes</button>
-            <button onClick={() => handleRequest(request, false)}>No</button>
-          </li>
-        ))}
-      </ul>
+
+              {request.type === "quiz" && request.topic && (
+                <p><strong>Topic:</strong> {request.topic}</p>
+              )}
+
+              <div className="button-container">
+                <button className="yes-btn" onClick={() => handleRequest(request, true)}>Yes</button>
+                <button className="no-btn" onClick={() => handleRequest(request, false)}>No</button>
+              </div>
+            </li>
+          ))}
+        </ul>
+      )}
     </div>
   );
 };
+
 
 export default Requests;

@@ -1,181 +1,57 @@
-/* Variables */
-:root {
-  --primary: #8A2BE2;    /* Vibrant Purple */
-  --secondary: #FF69B4;  /* Hot Pink */
-  --accent: #9370DB;     /* Medium Purple */
-  --bg-start: #1a1a2e;
-  --bg-end: #2d1b4e;
-  --glass-bg: rgba(255, 255, 255, 0.1);
-  --glass-border: rgba(255, 255, 255, 0.2);
-  --gold: #FFD700;
-  --silver: #C0C0C0;
-  --bronze: #CD7F32;
-  --primary-color: #8A2BE2;
-  --accent-color: #9370DB;
-  --text-color: white;
-  --background-color: rgba(26, 26, 46, 0.95);
-}
-
-/* Base Styles */
-* {
+body, html {
   margin: 0;
   padding: 0;
-  box-sizing: border-box;
-}
-
-body {
-  font-family: 'Orbitron', sans-serif;
-  background-color: var(--bg-start);
-  color: white;
-  line-height: 1.6;
-}
-
-/* Container and Background */
+  width: 100vw;
+  height: 100vh;
+  overflow-x: hidden;
+  background: linear-gradient(135deg, #4B0082, #8A2BE2); /* Deep Violet */
+}/* Dashboard Container */
 .dashboard-container {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
   position: relative;
   min-height: 100vh;
-  background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
   overflow: hidden;
+  background: linear-gradient(135deg, var(--bg-start), var(--bg-end));
+  color: var(--text-color);
+  text-align: center;
 }
 
-.animated-bg {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: 
-    radial-gradient(circle at 20% 20%, rgba(138, 43, 226, 0.2) 0%, transparent 25%),
-    radial-gradient(circle at 80% 80%, rgba(255, 105, 180, 0.2) 0%, transparent 25%);
-  animation: pulse 8s ease-in-out infinite;
-  z-index: 0;
-}
-
-@keyframes pulse {
-  0%, 100% { transform: scale(1); opacity: 0.5; }
-  50% { transform: scale(1.2); opacity: 0.8; }
-}
-
-/* Header */
-.dashboard-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  position: relative;
-  z-index: 2;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-}
-
-.gradient-text {
-  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
+/* Dashboard Title */
+h1 {
   font-size: 2rem;
-  margin: 0;
+  font-weight: bold;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
   animation: titleGlow 3s ease-in-out infinite;
 }
 
-/* Profile Section */
-.profile-section {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  position: static;
-  z-index: 3;
-}
-
-.profile-icon {
-  width: 40px;
-  height: 40px;
-  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: white;
+/* Steps Counter */
+.steps-counter {
+  font-size: 1.5rem;
+  margin: 1rem 0;
   font-weight: bold;
-  font-size: 1.2rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  cursor: pointer;
-  transition: transform 0.3s ease;
-  animation: float 3s ease-in-out infinite;
-}
-
-.profile-icon:hover {
-  transform: scale(1.1);
-}
-
-/* Stats Card */
-.stats-card {
-  background: rgba(255, 255, 255, 0.1);
-  border-radius: 12px;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s ease;
-  animation: cardFloat 4s ease-in-out infinite;
-  position: relative;
-  z-index: 2;
-}
-
-.stats-header {
-  margin-bottom: 1rem;
-}
-
-.steps-display {
-  display: flex;
-  align-items: center;
-  gap: 1.5rem;
-  margin-top: 1rem;
-}
-
-.steps-icon {
-  font-size: 2rem;
-}
-
-.steps-count h3 {
-  margin: 0;
-  color: var(--text-color);
-  font-size: 1rem;
-}
-
-.steps-number {
-  font-size: 2rem;
-  font-weight: bold;
-  color: var(--primary-color);
+  color: var(--primary);
   background: linear-gradient(45deg, var(--primary), var(--secondary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  animation: numberPulse 2s ease-in-out infinite;
 }
 
 /* Leaderboard Section */
-.leaderboard-section {
-  background: rgba(255, 255, 255, 0.1);
+.leaderboard-container {
+  background: var(--glass-bg);
   border-radius: 12px;
   padding: 1.5rem;
-  margin-bottom: 2rem;
-  -webkit-backdrop-filter: blur(10px);
+  margin-top: 2rem;
   backdrop-filter: blur(10px);
-  position: relative;
-  z-index: 2;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
 }
 
-.leaderboard-title {
-  margin: 0 0 1.5rem 0;
-  color: var(--text-color);
+.leaderboard-container h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
   background: linear-gradient(45deg, var(--primary), var(--secondary));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -186,7 +62,7 @@ body {
   padding: 0;
   margin: 0;
 }
-
+/* Leaderboard Item */
 .leaderboard-item {
   display: flex;
   justify-content: space-between;
@@ -196,44 +72,41 @@ body {
   border-radius: 8px;
   margin-bottom: 0.5rem;
   transition: transform 0.3s ease;
+  color: #e3d6e3; /* Light Violet Text */
+  font-weight: bold;
 }
+
+/* Change the text inside input fields inside leaderboard */
+
+
 
 .leaderboard-item:hover {
   transform: translateX(5px);
 }
 
-.empty-state {
-  text-align: center;
-  padding: 2rem;
+/* Leaderboard Button */
+.leaderboard-button {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
   color: var(--text-color);
-  opacity: 0.7;
-}
-
-/* Buttons */
-.action-button {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: var(--text-color);
-  padding: 0.75rem 1.5rem;
-  border-radius: 8px;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
   cursor: pointer;
   transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
 }
 
-.action-button:hover {
+.leaderboard-button:hover {
   background: rgba(255, 255, 255, 0.2);
   transform: translateY(-2px);
 }
 
+/* Add Leaderboard Button */
 .add-button {
-  background: linear-gradient(135deg, var(--primary-color), var(--accent-color));
-  color: white;
+  background: linear-gradient(135deg, var(--primary), var(--accent));
+  color: rgb(217, 81, 81);
   border: none;
   padding: 0.5rem 1rem;
-  border-radius: 6px;
+  border-radius: 50%;
   cursor: pointer;
   transition: all 0.3s ease;
   width: 50px;
@@ -241,18 +114,84 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 2rem auto;
+  margin: 1rem auto;
   animation: buttonPulse 2s infinite;
+  font-size: 1.5rem;
 }
 
 .add-button:hover {
   opacity: 0.9;
   transform: rotate(90deg) scale(1.1);
-  box-shadow: 0 0 20px rgba(138, 43, 226, 0.4);
 }
 
-/* NFT Dialog */
-.nft-dialog {
+/* Action Buttons *//* General Button Styles */
+button {
+  background: var(--glass-bg);
+  border: 1px solid var(--glass-border);
+  color: var(--text-color);
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1rem;
+  margin: 0.5rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+/* Hover & Active Effects */
+button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+}
+
+button:active {
+  transform: scale(0.95);
+}
+
+/* Requests Button */
+button:first-of-type {
+  background: linear-gradient(135deg, var(--gold), var(--silver));
+  color: rgb(19, 17, 17);
+}
+
+button:first-of-type:hover {
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+}
+
+/* Google Fit Button */
+button:nth-of-type(2) {
+  background: linear-gradient(135deg, #34A853, #4285F4); /* Google Colors */
+  color: white;
+}
+
+button:nth-of-type(2):hover {
+  box-shadow: 0 0 15px rgba(52, 168, 83, 0.6);
+}
+
+/* Mint NFT Button */
+button:last-of-type {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  font-weight: bold;
+}
+
+button:last-of-type:hover {
+  box-shadow: 0 0 20px rgba(138, 43, 226, 0.5);
+}
+
+/* Responsive */
+
+
+
+/* NFT Modal */
+.modal {
   position: fixed;
   top: 50%;
   left: 50%;
@@ -265,23 +204,54 @@ body {
   max-width: 90vw;
   max-height: 90vh;
   overflow-y: auto;
+  text-align: center;
   animation: slideIn 0.3s ease-out;
+}
+
+.modal h2 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+}
+
+.image-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.image-grid img {
+  width: 100px;
+  height: 100px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform 0.3s ease;
+}
+
+.image-grid img:hover {
+  transform: scale(1.1);
+}
+
+.close-button {
+  background: linear-gradient(135deg, var(--primary), var(--secondary));
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.close-button:hover {
+  opacity: 0.9;
+  transform: scale(1.1);
 }
 
 /* Animations */
 @keyframes titleGlow {
   0%, 100% { filter: drop-shadow(0 0 10px rgba(138, 43, 226, 0.5)); }
   50% { filter: drop-shadow(0 0 25px rgba(255, 105, 180, 0.8)); }
-}
-
-@keyframes float {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
-}
-
-@keyframes cardFloat {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-5px); }
 }
 
 @keyframes numberPulse {
@@ -300,31 +270,24 @@ body {
   to { transform: translate(-50%, -50%); opacity: 1; }
 }
 
-/* Responsive Design */
+/* Responsive */
 @media (max-width: 768px) {
   .dashboard-container {
     padding: 1rem;
   }
 
-  .dashboard-header {
-    flex-direction: column;
-    gap: 20px;
-    text-align: center;
-    padding: 15px;
-  }
-
-  .leaderboard-section {
+  .leaderboard-container {
     margin: 1rem;
     padding: 1.5rem;
   }
 
-  .action-button {
-    padding: 0.6rem 1.2rem;
-    font-size: 0.9rem;
+  .modal {
+    width: 90%;
+    padding: 1rem;
   }
 
-  .nft-dialog {
-    width: 95%;
-    padding: 1rem;
+  button {
+    padding: 0.6rem 1.2rem;
+    font-size: 0.9rem;
   }
 }

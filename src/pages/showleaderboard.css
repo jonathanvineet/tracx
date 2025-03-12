@@ -1,0 +1,218 @@
+/* Page Container */
+.show-leaderboard-container {
+    max-width: 800px;
+    margin: 50px auto;
+    padding: 2rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.1);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    text-align: center;
+    color: #E6E6FA; /* Lavender */
+  }
+  
+  /* Title */
+  .show-leaderboard-container h1 {
+    font-size: 2.5rem;
+    font-weight: bold;
+    background: linear-gradient(135deg, #E6E6FA, #8A2BE2);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 1rem;
+  }
+  
+  /* Participants Section */
+  .show-leaderboard-container h2 {
+    font-size: 1.8rem;
+    color: #D8BFD8; /* Light Violet */
+    margin-bottom: 0.5rem;
+  }
+  
+  /* Participants List */
+  .show-leaderboard-container ul {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .show-leaderboard-container li {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 12px;
+    margin: 8px 0;
+    border-radius: 8px;
+    color: white;
+    font-size: 1.1rem;
+    font-weight: bold;
+  }
+  
+  /* User Email */
+  .show-leaderboard-container p {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #E6E6FA;
+    margin-top: 10px;
+  }
+  
+  /* Timer */
+  .show-leaderboard-container h3 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #FFD700; /* Gold */
+    margin-top: 15px;
+  }
+  
+  /* Quiz Stake Section */
+  .show-leaderboard-container .quiz-section {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1.5rem;
+    border-radius: 10px;
+    margin-top: 20px;
+  }
+  
+  /* Stake Status */
+  .show-leaderboard-container .quiz-section p {
+    font-size: 1.1rem;
+    font-weight: bold;
+    margin-top: 10px;
+  }
+  
+  /* Alert Messages */
+  .show-leaderboard-container .alert {
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: bold;
+    margin-top: 10px;
+  }
+  
+  .show-leaderboard-container .alert.success {
+    background: rgba(50, 205, 50, 0.2);
+    color: #32CD32; /* Lime Green */
+  }
+  
+  .show-leaderboard-container .alert.warning {
+    background: rgba(255, 165, 0, 0.2);
+    color: #FFA500; /* Orange */
+  }
+  
+  /* Claim Reward Button */
+  .show-leaderboard-container button.claim-reward {
+    background: linear-gradient(135deg, #6a1bb8, #ba68c8);
+    color: white;
+    font-size: 1.1rem;
+    font-weight: bold;
+    padding: 12px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    margin-top: 10px;
+  }
+  
+  .show-leaderboard-container button.claim-reward:hover {
+    box-shadow: 0 0 15px rgba(138, 43, 226, 0.5);
+    transform: scale(1.05);
+  }
+  /* Invite Popup Styling */
+.invite-popup {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    text-align: center;
+    width: 350px;
+    margin: 1.5rem auto;
+    color: #E6E6FA; /* Lavender */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Input Field */
+  .invite-popup input {
+    width: 90%;
+    padding: 12px;
+    margin: 15px 0;
+    border: 2px solid rgba(138, 43, 226, 0.5); /* Soft Purple Border */
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    text-align: center;
+    outline: none;
+    transition: all 0.3s ease;
+  }
+  
+  /* Input Placeholder */
+  .invite-popup input::placeholder {
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: normal;
+  }
+  
+  /* Input Focus Effect */
+  .invite-popup input:focus {
+    border-color: #8A2BE2; /* Bright Violet */
+    background: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 10px rgba(138, 43, 226, 0.6);
+    transform: scale(1.05);
+  }
+  
+  /* Button Container */
+  .invite-popup .button-container {
+    display: flex;
+    justify-content: space-around;
+    width: 100%;
+    margin-top: 15px;
+  }
+  
+  /* Send Invite Button (Yellow like Start Button) */
+  .invite-popup .send-btn {
+    background: linear-gradient(135deg, #FFD700, #d8c39c); /* Gold to Orange */
+    color: black;
+    font-size: 1rem;
+    font-weight: bold;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 45%;
+  }
+  
+  .invite-popup .send-btn:hover {
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.8);
+    transform: scale(1.05);
+  }
+  
+  /* Cancel Button (Violet like Invite People Button) */
+  .invite-popup .cancel-btn {
+    background: linear-gradient(135deg, #8A2BE2, #9f4e9f);
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    padding: 10px 18px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 45%;
+  }
+  
+  .invite-popup .cancel-btn:hover {
+    box-shadow: 0 0 12px rgba(138, 43, 226, 0.6);
+    transform: scale(1.05);
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .show-leaderboard-container {
+      width: 90%;
+      padding: 1.5rem;
+    }
+  
+    .show-leaderboard-container h1 {
+      font-size: 2rem;
+    }
+  }
+  

@@ -120,69 +120,69 @@ const CreateLeaderboard = () => {
       state: { leaderboardId: uniqueId, email },
     });
   };
-
   return (
-    <div>
+    <div className="create-leaderboard-container">
       <h1>Create a Leaderboard</h1>
+
+      {/* Leaderboard Name Input */}
       <input
         type="text"
         placeholder="Enter leaderboard name"
         value={leaderboardName}
         onChange={(e) => setLeaderboardName(e.target.value)}
       />
-      <br />
-      <label>
-        Select Type:
-        <select
-          value={type}
-          onChange={(e) => {
-            setType(e.target.value);
-            setTime(""); // Reset time when type changes
-            setTopic(""); // Reset topic when type changes
-          }}
-        >
-          <option value="">--Select--</option>
-          {typeOptions.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-      </label>
-      <br />
-      <label>
-        Select Time:
-        <select
-          value={time}
-          onChange={(e) => setTime(e.target.value)}
-          disabled={!type} // Disable time selection if no type is selected
-        >
-          <option value="">--Select--</option>
-          {type && timeOptions[type].map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
-          ))}
-        </select>
-      </label>
-      <br />
+
+      {/* Select Type */}
+      <label>Select Type:</label>
+      <select
+        value={type}
+        onChange={(e) => {
+          setType(e.target.value);
+          setTime(""); // Reset time when type changes
+          setTopic(""); // Reset topic when type changes
+        }}
+      >
+        <option value="">--Select--</option>
+        {typeOptions.map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+
+      {/* Select Time */}
+      <label>Select Time:</label>
+      <select
+        value={time}
+        onChange={(e) => setTime(e.target.value)}
+        disabled={!type} // Disable time selection if no type is selected
+      >
+        <option value="">--Select--</option>
+        {type && timeOptions[type].map((option) => (
+          <option key={option} value={option}>
+            {option}
+          </option>
+        ))}
+      </select>
+
+      {/* Quiz Topic Input (Only for Quiz Type) */}
       {type === "quiz" && (
         <div>
-          <label>
-            Enter Topic:
-            <input
-              type="text"
-              placeholder="Enter quiz topic"
-              value={topic}
-              onChange={(e) => setTopic(e.target.value)}
-            />
-          </label>
+          <label>Enter Topic:</label>
+          <input
+            type="text"
+            placeholder="Enter quiz topic"
+            value={topic}
+            onChange={(e) => setTopic(e.target.value)}
+          />
         </div>
       )}
-      <br />
+
+      {/* Create Button */}
       <button onClick={createLeaderboard}>Create</button>
     </div>
   );
 };
+
 
 export default CreateLeaderboard;

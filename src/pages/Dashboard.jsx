@@ -6,6 +6,7 @@ import { useGoogleLogin } from "@react-oauth/google";
 import { BrowserProvider } from "ethers";
 import { meta } from "@eslint/js";
 import { ethers } from "ethers";
+import "./Dashboard.css";
 const Dashboard = () => {
   const location = useLocation();
   const navigate = useNavigate();
@@ -341,136 +342,68 @@ const handleViewLeaderboard = (leaderboardId) => {
   };
 
 
-  
   return (
-    <div>
+    <div className="dashboard-container">
       <h1>Welcome to the Dashboard!</h1>
-      <p>Your Steps Today: {steps !== null ? steps : "Loading..."}</p>
-        {/* Leaderboards Container */}
-      <div
-        style={{
-          border: "1px solid #ddd",
-          borderRadius: "8px",
-          padding: "20px",
-          marginTop: "20px",
-          maxWidth: "400px",
-          margin: "0 auto",
-        }}
-      >
-        <h2 style={{ textAlign: "center" }}>User Leaderboards</h2>
+      <p className="steps-counter">
+        Your Steps Today: {steps !== null ? steps : "Loading..."}
+      </p>
+  
+      {/* Leaderboards Container */}
+      <div className="leaderboard-container">
+        <h2>User Leaderboards</h2>
         {leaderboards && leaderboards.length > 0 ? (
-  <ul style={{ listStyleType: "none", padding: 0, margin: 0 }}>
-    {leaderboards.map((leaderboard, index) => {
-      if (!leaderboard || !leaderboard.id || !leaderboard.name) {
-        console.warn("Invalid leaderboard data:", leaderboard);
-        return null;
-      }
-
-      return (
-        <li
-          key={leaderboard.id}
-          style={{
-            display: "flex",
-            justifyContent: "space-between",
-            alignItems: "center",
-            padding: "10px 0",
-            borderBottom: "1px solid #ddd",
-          }}
-        >
-          <span>{leaderboard.name}</span>
-          <button
-            style={{
-              backgroundColor: "#007BFF",
-              color: "#fff",
-              border: "none",
-              borderRadius: "4px",
-              padding: "5px 10px",
-              cursor: "pointer",
-            }}
-            onClick={() => handleViewLeaderboard(leaderboard.id)}
-          >
-            View
-          </button>
-        </li>
-      );
-    })}
-  </ul>
-) : (
-  <p>No leaderboards found. Create one to get started!</p>
-)}
-
-        <button
-          onClick={handleCreateLeaderboard}
-          style={{
-            display: "block",
-            margin: "10px auto",
-            backgroundColor: "#28a745",
-            color: "#fff",
-            border: "none",
-            borderRadius: "50%",
-            width: "40px",
-            height: "40px",
-            fontSize: "20px",
-            lineHeight: "40px",
-            textAlign: "center",
-            cursor: "pointer",
-          }}
-        >
+          <ul className="leaderboard-list">
+            {leaderboards.map((leaderboard) => (
+              <li key={leaderboard.id} className="leaderboard-item">
+                <span>{leaderboard.name}</span>
+                <button
+                  className="leaderboard-button"
+                  onClick={() => handleViewLeaderboard(leaderboard.id)}
+                >
+                  View
+                </button>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>No leaderboards found. Create one to get started!</p>
+        )}
+  
+        <button onClick={handleCreateLeaderboard} className="add-button">
           +
         </button>
       </div>
+  
+      {/* Other Buttons */}
       <button onClick={showRequests}>Requests</button>
       <button onClick={() => handleGoogleFitLogin()}>Connect to Google Fit</button>
       <button onClick={toggleMintDialog}>Mint NFT</button>
+  
       {showMintDialog && (
-        <div
-          style={{
-            position: "fixed",
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            backgroundColor: "#fff",
-            padding: "20px",
-            borderRadius: "8px",
-            boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
-            zIndex: 1000,
-          }}
-        >
+        <div className="modal">
           <h2>Select an Image to Mint as NFT</h2>
-          <div
-            style={{
-              display: "grid",
-              gridTemplateColumns: "repeat(2, 1fr)",
-              gap: "10px",
-            }}
-          >
+          <div className="image-grid">
             {images.map((image) => (
               <img
                 key={image.id}
                 src={image.src}
                 alt={image.alt}
-                style={{
-                  width: "100%",
-                  height: "auto",
-                  cursor: "pointer",
-                  borderRadius: "4px",
-                  border: "1px solid #ccc",
-                }}
                 onClick={async () => {
-                  console.log(`Photo clicked: ${image.alt}`); // Debugging step to log photo name
-                
+                  console.log(`Photo clicked: ${image.alt}`);
+  
                   try {
                     const { data, error } = await supabase
                       .from("nfts")
                       .select("metadata_url, photo_name")
                       .eq("photo_name", image.alt);
-                    
+  
                     if (error) {
                       console.error("Error fetching metadata URL:", error);
                       alert("Failed to fetch NFT metadata.");
                       return;
                     }
-                
+  
                     if (data && data.length === 1) {
                       alert(`Metadata URL: ${data[0].metadata_url}`);
                       await mintNFT(data[0].metadata_url);
@@ -484,17 +417,17 @@ const handleViewLeaderboard = (leaderboardId) => {
                     alert("An unexpected error occurred.");
                   }
                 }}
-                
               />
             ))}
           </div>
-          <button onClick={toggleMintDialog} style={{ marginTop: "10px" }}>
+          <button onClick={toggleMintDialog} className="close-button">
             Close
           </button>
         </div>
       )}
     </div>
   );
+  
 };
 
 export default Dashboard;

@@ -1,0 +1,113 @@
+/* Request Container */
+.request-container {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    backdrop-filter: blur(10px);
+    text-align: center;
+    width: 450px;
+    margin: 2rem auto;
+    color: #E6E6FA; /* Lavender */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  /* Title */
+  .request-container h1 {
+    font-size: 1.8rem;
+    color: white;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 8px rgba(255, 255, 255, 0.2);
+  }
+  
+  /* Status Message */
+  .request-container p {
+    font-size: 1rem;
+    color: #FFD700; /* Gold */
+    margin-bottom: 1rem;
+    font-weight: bold;
+  }
+  
+  /* Request List */
+  .request-list {
+    list-style: none;
+    padding: 0;
+    width: 100%;
+  }
+  
+  .request-list li {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 10px 0;
+    text-align: left;
+    color: white;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  }
+  
+  /* Topic Styling */
+  .request-list p {
+    margin: 8px 0;
+    font-weight: bold;
+    color: #D8BFD8;
+  }
+  
+  /* Button Container */
+  .button-container {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 10px;
+  }
+  
+  /* Accept Button (Yellow like Start Button) */
+  .yes-btn {
+    background: linear-gradient(135deg, #FFD700, #FFA500); /* Gold to Orange */
+    color: black;
+    font-size: 1rem;
+    font-weight: bold;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 45%;
+  }
+  
+  .yes-btn:hover {
+    box-shadow: 0 0 12px rgba(255, 215, 0, 0.8);
+    transform: scale(1.05);
+  }
+  
+  /* Reject Button (Violet like Invite People Button) */
+  .no-btn {
+    background: linear-gradient(135deg, #8A2BE2, #D8BFD8);
+    color: white;
+    font-size: 1rem;
+    font-weight: bold;
+    padding: 8px 16px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    width: 45%;
+  }
+  
+  .no-btn:hover {
+    box-shadow: 0 0 12px rgba(138, 43, 226, 0.6);
+    transform: scale(1.05);
+  }
+  /* No Requests Message */
+.no-requests {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: white;
+    text-align: center;
+    margin-top: 2rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  }
+  
