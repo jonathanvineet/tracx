@@ -126,5 +126,5 @@ This project is licensed under the MIT License.
 Contact
 For any questions or feedback, feel free to reach out:
 
-Email: cvineetjonathan@gmail.com
-GitHub: jonathanvineet
+Email: thameemulazarudeen.27csb@licet.ac.in
+GitHub: AZAR2305
